@@ -376,6 +376,11 @@ summary {
 </div>
 <div id="data" class="section level1">
 <h1>Data</h1>
+<p>Documentation for data:</p>
+<ul>
+<li><a href="https://www.google.com/covid19/mobility/data_documentation.html">Google Mobility Data</a></li>
+<li><a href="https://github.com/owid/covid-19-data/tree/master/public/data">Our World in Data COVID-19 dataset</a></li>
+</ul>
 <pre class="r"><code># Downloading mobility data from Google
 download.file(url = &quot;https://www.gstatic.com/covid19/mobility/Region_Mobility_Report_CSVs.zip&quot;,
               destfile = &quot;Data/Region_Mobility_Report_CSVs.zip&quot;)
@@ -397,6 +402,41 @@ mobility_hu_21 &lt;- read_csv(&quot;Data/2021_HU_Region_Mobility_Report.csv&quot
 owd_covid_HU &lt;-
   read_csv(&quot;https://covid.ourworldindata.org/data/owid-covid-data.csv&quot;) %&gt;% 
   filter(iso_code == &quot;HUN&quot;)</code></pre>
+</div>
+<div id="data-wrangling" class="section level1">
+<h1>Data Wrangling</h1>
+<p>Google’s mobility data is divided into separate files by year. Below I join the dataframes and create a separate DF for Hungary overall, and a DF with all subregions. Mobility data and COVID-19 data also need to be joined.</p>
+<pre class="r"><code># Joining dataframes
+mobility_hu &lt;- bind_rows(mobility_hu_20, mobility_hu_21)
+
+# New dataframe for Hungary overall
+mobility_hu_OVR &lt;-
+  mobility_hu %&gt;% 
+  filter(is.na(sub_region_1) == TRUE) %&gt;% 
+  select(date:last_col())
+
+# New dataframe for subregions of Hungary
+mobility_hu_sub &lt;-
+  mobility_hu %&gt;% 
+  filter(is.na(sub_region_1) == FALSE) %&gt;% 
+  select(c(sub_region_1, iso_3166_2_code, date:last_col()))
+
+# Selecting relevant variables
+owd_covid_HU &lt;-
+  owd_covid_HU %&gt;% 
+  select(c(date, new_cases:new_deaths_smoothed_per_million,
+           people_vaccinated:new_vaccinations_smoothed,
+           people_fully_vaccinated_per_hundred:new_vaccinations_smoothed_per_million))
+
+# Joining mobility and COVID-19 data
+mobility_covid &lt;- 
+  mobility_hu_OVR %&gt;% 
+  left_join(owd_covid_HU, by = &quot;date&quot;)
+
+# Joining mobility and COVID-19 data for subregions
+mobility_covid_subregions &lt;-
+  mobility_hu_sub %&gt;% 
+  left_join(owd_covid_HU, by = &quot;date&quot;)</code></pre>
 </div>
 
 
