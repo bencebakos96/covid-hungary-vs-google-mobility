@@ -1,0 +1,49 @@
+---
+title: "Hungarian COVID-19 deaths vs. Google's mobility data"
+author: "Bence E. Bakos"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Packages
+
+```{r packages}
+library(tidyverse)
+```
+
+# Data
+
+```{r data}
+# Downloading mobility data from Google
+download.file(url = "https://www.gstatic.com/covid19/mobility/Region_Mobility_Report_CSVs.zip",
+              destfile = "Data/Region_Mobility_Report_CSVs.zip")
+
+# Unzipping relevant files
+unzip(zipfile = "Data/Region_Mobility_Report_CSVs.zip",
+      files = "2020_HU_Region_Mobility_Report.csv",
+      exdir = "Data")
+
+unzip(zipfile = "Data/Region_Mobility_Report_CSVs.zip",
+      files = "2021_HU_Region_Mobility_Report.csv",
+      exdir = "Data")
+
+# Importing relevant files
+mobility_hu_20 <- read_csv("Data/2020_HU_Region_Mobility_Report.csv")
+mobility_hu_21 <- read_csv("Data/2021_HU_Region_Mobility_Report.csv")
+
+# Downloading and importing COVID-19 data from Our World in Data
+owd_covid_HU <-
+  read_csv("https://covid.ourworldindata.org/data/owid-covid-data.csv") %>% 
+  filter(iso_code == "HUN")
+```
+
+# Data Wrangling
+
+```{r wrangling}
+
+```
+
